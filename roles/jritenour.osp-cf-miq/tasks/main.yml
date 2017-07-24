@@ -1,0 +1,48 @@
+---
+# tasks file for jritenour.osp-cf-miq
+  - name: Create CFME DB volume
+    os_volume:
+      auth:
+        auth_url: "{{ osp_url }}"
+        username: "{{ osp_user }}"
+        password: "{{ osp_pass }}"
+        project_name: "{{ osp_project }}"
+      state: present
+      availability_zone: "{{ az }}"
+      size: "{{ db_size }}"
+      display_name: "{{ db_vol_name }}"
+
+  - name: launch instances
+    os_server:
+      auth:
+        auth_url: "{{ osp_url }}"
+        username: "{{ osp_user }}"
+        password: "{{ osp_pass }}"
+        project_name: "{{ osp_project }}"
+      name: "{{ vm_name }}"
+      state: present
+      key_name: "{{ key_name }}"
+      availability_zone: "{{ az }}"
+      nics:
+        - net-name: "{{ network_name }}"
+      image: "{{ image_uid }}"
+      flavor: "{{ flavor_name }}"
+      floating_ips:
+        - "{{ float_ip }}"
+      volumes:
+        - "{{ db_vol_name }}"
+    register: osp_host
+
+  - name: add host to inventory
+    add_host:
+      name: "{{ float_ip }}"
+      ansible_user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+
+  - name: wait for instance become ready to use
+    wait_for:
+     host: "{{ float_ip }}"
+     port: "22"
+     delay: "60"
+     timeout: "320"
+     state: "started"

@@ -1,0 +1,28 @@
+#NOTE: As of today, azure_rm_virtualmachine can only create instances from marketplace images.  There is currently a PR to add an image_uri parameter which will allow for custom images.  This playbook will not work until that parameter is implemented, and this is more or less a placeholder until that happens
+---
+- hosts: all
+  vars:
+  vars_files:
+    - vars.yml
+  tasks:
+  - name: Create VM with defaults
+    azure_rm_virtualmachine:
+      name: cf-azure-db
+      resource_group: "{{ rg }}"
+      image_uri: "{{ image }}"
+      location: "{{ az }}"
+      os_type: linux
+      vm_size: "{{ flavor }}"
+      virtual_network_name: "{{ network_name }}"
+    register: azure_vm
+
+  - add_host:
+      name: '{{ azure_vm.public_dns_name }}'
+
+  - name: wait when instance become ready to use
+    wait_for:
+     host: '{{ azure_vm.public_dns_name }}'
+     port: "22"
+     delay: "60"
+     timeout: "320"
+     state: "started"

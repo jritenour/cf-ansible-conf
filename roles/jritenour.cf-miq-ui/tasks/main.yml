@@ -1,0 +1,23 @@
+---
+# tasks file for jritenour.cf-miq-wk
+  - name: Join CloudForms/ManageIQ region
+    command: appliance_console_cli -K  {{ db_server }} --sshlogin {{ ssh_user }} --sshpassword {{ cf_ssh_pass }} --hostname {{ db_server }} --password {{ cf_db_pass }}
+
+  - name: Wait for CloudForms services to come up
+    wait_for:
+      host: "{{ansible_eth0.ipv4.address }}"
+      port: "443"
+      delay: "120"
+      timeout: "600"
+      state: "started"
+
+  - name: Additional wait for API to become responive
+    pause:
+      minutes: 1
+
+  - name: Configure Roles
+    command: "/var/www/miq/vmdb/bin/rails runner ''MiqServer.my_server.set_config(:server => {:role => \"user_interface,web_services,websocket\"})'"
+  - name: restart EVM
+    service:
+      name: evmserverd
+      state: restarted

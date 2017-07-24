@@ -1,0 +1,4 @@
+---
+- include: vmware-db-create.yml
+- include: vmware-ui-create.yml
+- include: vmware-wk-create.yml

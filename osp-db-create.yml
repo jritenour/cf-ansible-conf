@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  remote_user: root
+  vars_files:
+    - 'roles/jritenour.cf-variables/vars/main.yml'
+  roles:
+    - {role: 'roles/jritenour.osp-cf-miq'}
+
+- hosts: cfdb
+  remote_user: root
+  vars_files:
+    - 'roles/jritenour.cf-variables/vars/main.yml'
+  roles: 
+    - {role: 'roles/jritenour.cf-miq-db'}
+  tasks:
+  - name: Wait for CloudForms services to come up
+    wait_for:
+      host: "{{ float_ip }}"
+      port: "443"
+      delay: "120"
+      timeout: "600"
+      state: "started"
+
+  - name: Additional wait for API to become responive
+    pause:
+      minutes: 1
+
+  - name: Add host platform as provider
+    uri:
+      url: "https://{{ float_ip }}/api/providers"
+      method: POST
+      user: admin
+      password: "{{ cf_ssh_pass }}"
+      validate_certs: no
+      headers:
+        Content-Type:  application/json
+      body_format: json
+      body:
+        type: "ManageIQ::Providers::Openstack::CloudManager"
+        name:  OSP
+        hostname: "{{ osp_ip }}"
+        ipaddress: "{{ osp_ip }}"
+        port: "5000"
+        security_protocol: "non_ssl"
+        credentials:
+          userid: "{{ osp_user }}"
+          password: "{{ osp_pass }}"

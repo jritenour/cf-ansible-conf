@@ -1,0 +1,53 @@
+---
+# tasks file for jritenour.ec2-cf-miq
+
+  - name: launch instances
+    ec2:
+      key_name: "{{ key_name }}"
+      aws_access_key: "{{ ec2_access_key }}"
+      aws_secret_key: "{{ ec2_secret_key }}"
+      instance_type: "{{ flavor_name }}" # Note - m4.xlarge is recommended per CF resource requrements
+      group: "{{ security_group }}"
+      image: "{{ ami_id }}"
+      region: "{{ az }}"
+      instance_tags: 
+        Name: "{{ vm_name }}"
+      wait: yes
+      wait_timeout: 500
+      volumes:
+        - device_name: "{{ cf_db_dev }}"
+          volume_type: gp2
+          volume_size: "{{ db_size }}"
+      vpc_subnet_id: "{{ subnet_id }}"
+      assign_public_ip: yes
+    register: ec2_host
+
+  - name: add host to inventory
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: cfdb
+    with_items: "{{ ec2_host.instances  }}"
+    when: db
+
+  - name: add host to inventory
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: cfui
+    with_items: "{{ ec2_host.instances  }}"
+    when: ui
+
+  - name: add host to inventory
+    add_host:
+      hostname: "{{ item.public_ip }}"
+      groupname: cfwk
+    with_items: "{{ ec2_host.instances  }}"
+    when: wk
+
+  - name: wait for instance become ready to use
+    wait_for:
+      port: "22"
+      host: "{{ item.public_dns_name }}"
+      delay: "60"
+      timeout: "320"
+      state: "started"
+    with_items: "{{ ec2_host.instances  }}"

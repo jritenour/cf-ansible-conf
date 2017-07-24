@@ -1,0 +1,52 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  remote_user: root
+  vars:
+    type: db
+    db: true
+    ui: false
+    wk: false
+  vars_files:
+    - 'roles/jritenour.cf-variables/vars/main.yml'
+  roles:
+    - {role: 'roles/jritenour.vmware-cf-miq'}
+
+- hosts: cfdb
+  remote_user: root
+  vars_files:
+    - 'roles/jritenour.cf-variables/vars/main.yml'
+  roles: 
+    - {role: 'roles/jritenour.cf-miq-db'}
+  tasks:
+  - name: Wait for CloudForms services to come up
+    wait_for:
+      host: "{{ansible_eth0.ipv4.address }}"
+      port: "443"
+      delay: "120"
+      timeout: "600"
+      state: "started"
+
+  - name: Additional wait for API to become responive
+    pause:
+      minutes: 1
+
+  - name: Add host platform as provider
+    uri:
+      url: "https://{{ ansible_eth0.ipv4.address }}/api/providers"
+      method: POST
+      user: admin
+      password: "{{ cf_ssh_pass }}"
+      validate_certs: no
+      headers:
+        Content-Type:  application/json
+      body_format: json
+      body:
+        type: "ManageIQ::Providers::Vmware::InfraManager"
+        name:  VMware
+        hostname: "{{ vcenter_ip }}"
+        ipaddress: "{{ vcenter_ip }}"
+        credentials:
+          userid: "{{ vcenter_user }}"
+          password: "{{ vcenter_pass }}"

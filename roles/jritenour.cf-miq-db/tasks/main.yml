@@ -1,0 +1,5 @@
+---
+# tasks file for jritenour.cf-miq-db
+
+  - name: Configure CF DB
+    command: appliance_console_cli -k -i -p "{{ cf_db_pass }}" -b "{{ cf_db_dev }}" -r "{{ region_num }}"

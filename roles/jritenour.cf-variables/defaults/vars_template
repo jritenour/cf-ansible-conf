@@ -1,0 +1,40 @@
+osp_url: http://osp.example.com:5000/v2.0 # OpenStack specific
+osp_ip: 192.168.2.25 # OpenStack specific
+osp_user: admin # OpenStack specific
+osp_pass: P@ssw0rd # OpenStack specific
+osp_project: admin  # OpenStack specific
+az: nova # works with OpenStack, EC2 & Azure
+db_size: 10GiB # note that RHV requires the 'GiB' suffix - all other providers just take the integer
+db_vol_name: cfme-db-vol
+db_server:  192.168.2.2.40 #IP/FQN of cf database server
+vm_name: cfme-db-1
+key_name: admin #works with OpenStack & EC2
+network_name: ovirtmgmt # Works with all providers
+image_uid: 000000-00000-00000-00000 # works with OpenStack
+flavor_name: m1.xlarge # works with OSP/Azure/AWS
+float_ip: 192.168.2.44 #OpenStack specific
+ssh_user:
+cf_db_pass: 'P@ssw0rd'
+cf_ssh_pass: 'P@ssw0rd'
+cf_db_dev: '/dev/vdb'
+region_num: 20
+security_group: default # works with OpenStack & EC2
+ami_id: ami-123456ab # ec2 specific
+subnet_id: subnet-12345 # ec2 specific
+vcenter_ip: 192.168.2.26  # vmware specific - vcenter fqdn/ip
+esx_host: 192.168.2.25 #esxi fqdn/ip - vmware specific
+vcenter_user: 'administrator@local.lab' # vmware specific
+vcenter_pass: 'P@ssw0rd'  # vmware specific
+vc_datacenter: DC  # vmware specific
+vc_datastore: datastore1 # vwmare specific
+template_name: cfme45 # vmware & rhv
+rhvm_addr: 192.168.2.26 # rhv specifc
+rhv_user: 'admin@internal' # rhv specific
+rhv_pass: 'P@ssw0rd' # rhv specific
+ipaddr: 192.168.2.40 # rhv specific - will refactor OSP at some point to use this istead of float_ip
+netmask: 255.255.255.0 # rhv specfic
+gateway: 192.168.2.1 # rhv specific
+dns: 8.8.8.8
+datastore: DATA # rhv - will refactor vmware to share this param instead of vc_datastore
+cluster: Default # rhv - will include in VMWware soon
+~                                                                

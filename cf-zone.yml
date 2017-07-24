@@ -1,0 +1,5 @@
+---
+- hosts: all
+  tasks:
+  - name: Create Zone
+    shell: "/var/www/miq/vmdb/bin/rails runner 'Zone.create(:name => \"{{ zone_name }}\", :description => \"{{ zone_desc }}\")'"

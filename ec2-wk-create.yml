@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  remote_user: root
+  vars_files:
+    - 'roles/jritenour.cf-variables/vars/main.yml'
+  vars:
+    db: false
+    ui: false
+    wk: true
+  roles:
+    - {role: 'roles/jritenour.ec2-cf-miq'}
+
+- hosts: cfwk
+  remote_user: ec2-user
+  gather_facts: no
+  become: true
+  tasks: 
+    - name:
+      command: "sudo sed -i 's/^.*ssh-rsa/ssh-rsa/p' /root/.ssh/authorized_keys"
+
+- hosts: cfwk
+  remote_user: root
+  vars_files:
+    - 'roles/jritenour.cf-variables/vars/main.yml'
+  roles: 
+    - {role: 'roles/jritenour.cf-miq-wk'}
