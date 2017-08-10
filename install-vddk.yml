@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Extract VDDK archive
+    unarchive: 
+      src: VMware-vix-disklib-6.0.0-2498720.x86_64.tar.gz
+      dest: /usr/lib/
+  - name: move the vmware-vix dir
+    command: 'mv /usr/lib/vmware-vix-disklib-distrib  /usr/lib/vmware-vix-disklib'
+  - name: Link libvixDiskLib.so
+    file:
+      src: /usr/lib/vmware-vix-disklib/lib64/libvixDiskLib.so
+      dest: /usr/lib/libvixDiskLib.so
+      state: link
+  - name: Link libvixDiskLib.so.6
+    file:
+      src: /usr/lib/vmware-vix-disklib/lib64/libvixDiskLib.so.6
+      dest: /usr/lib/libvixDiskLib.so.6
+      state: link
+  - name: Run ldconfig
+    command: 'ldconfig'
