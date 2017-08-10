@@ -50,3 +50,21 @@
         credentials:
           userid: "{{ vcenter_user }}"
           password: "{{ vcenter_pass }}"
+  - name: Download automate file
+    get_url:
+      url: https://raw.githubusercontent.com/jritenour/cf-poc/master/automate/datastore.zip
+      dest: /root/datastore.zip
+      mode: 0644
+  - name: Import automate domain
+    command: '/var/www/miq/vmdb/bin/rake evm:automate:import DOMAIN=POC ZIP_FILE=/root/datastore.zip PREVIEW=false ENABLED=true'
+    args:
+      chdir: /var/www/miq/vmdb
+  - name: Download dialog file
+    get_url:
+      url: https://raw.githubusercontent.com/jritenour/cf-poc/master/dialogs/dialog.yml
+      dest: /root/dialog.yml
+      mode: 0644
+  - name: Import service dialogs
+    command: "/var/www/miq/vmdb/bin/rake dialogs:import['/root/dialog.yml']"
+    args:
+      chdir: /var/www/miq/vmdb
