@@ -1,9 +1,13 @@
 ---
 - hosts: localhost
   tasks:
+  - name: Copy VDDK to appliance
+    copy:
+      src: /staging/VMware-vix-disklib-6.0.0-2498720.x86_64.tar.gz
+      dest: /root/VMware-vix-disklib-6.0.0-2498720.x86_64.tar.gz
   - name: Extract VDDK archive
     unarchive: 
-      src: VMware-vix-disklib-6.0.0-2498720.x86_64.tar.gz
+      src: /root/VMware-vix-disklib-6.0.0-2498720.x86_64.tar.gz
       dest: /usr/lib/
   - name: move the vmware-vix dir
     command: 'mv /usr/lib/vmware-vix-disklib-distrib  /usr/lib/vmware-vix-disklib'

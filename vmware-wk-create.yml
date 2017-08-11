@@ -8,6 +8,8 @@
     db: false
     ui: false
     wk: true
+    zone_name: VMware
+    zone_desc: VMware Worker Zone
   vars_files:
     - 'roles/jritenour.cf-variables/vars/main.yml'
   roles:
@@ -19,3 +21,6 @@
     - 'roles/jritenour.cf-variables/vars/main.yml'
   roles: 
     - {role: 'roles/jritenour.cf-miq-wk'}
+  - name: Create Zone
+    shell: "/var/www/miq/vmdb/bin/rails runner 'Zone.create(:name => \"{{ zone_name }}\", :description => \"{{ zone_desc }}\")'"
+  - include: install-vddk.yml
