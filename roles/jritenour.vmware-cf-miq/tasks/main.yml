@@ -18,6 +18,19 @@
         type: thin
         datastore: "{{ vc_datastore }}"
       template: "{{ template_name }}"
+      networks:
+      - name: VM Network
+        ip: "{{ ip_addr }}"
+        netmask: "{{ mask }}"
+        gateway: "{{ gateway }}"
+        domain: "{{ domain }}"
+        dns_servers:
+        - "{{ dns1 }}"
+        - "{{ dns2 }}"
+      customization:
+        dns_servers:
+        - "{{ dns1 }}"
+        - "{{ dns2 }}"
       wait_for_ip_address: yes
     delegate_to: localhost
     register: deploy

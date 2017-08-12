@@ -12,6 +12,12 @@ The following "default" playbooks are setup:
 
 *osp-db-create* - Creates the DB server on OpenStack.  I have note tested this yet since breaking everything into roles, but it *should* work.  Will test later in the week when I get access to an OpenStack environment again.
 
+**NOTE:** Due to [BZ 1439373](https://bugzilla.redhat.com/show_bug.cgi?id=1439373), you'll need to import the VMware CF appliance OVF, power it up once, remove persistent udev rules and ssh host keys, then run
+
+**echo "network: {config: disabled}" >> /etc/cloud/cloud.cfg.d/10_miq_cloud.cfg**
+
+This will prevent cloud-init from wiping out the static network configuration on reboot.
+
 *rhv-db-create* - Creates the DB server on Red Hat Virtualization.  Note that only RHV/Ovirt 4.x is supported at this time - RHEV 3.x uses a different set of ansible modules. I don't plan to support 3.x as it will be EOL relatively soon.
 
 *vmware-db-create* - Creates the DB server in Vmware.

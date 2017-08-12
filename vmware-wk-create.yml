@@ -8,6 +8,7 @@
     db: false
     ui: false
     wk: true
+    ip_addr: "{{ wk_server }}"
   vars_files:
     - '../main.yml'
   roles:
