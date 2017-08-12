@@ -1,0 +1,66 @@
+---
+- hosts: localhost
+  vars_files:
+    - '../main.yml'
+  tasks: 
+  - name: create the VM
+    vmware_guest:
+      hostname: "{{ vcenter_ip }}"
+      username: "{{ vcenter_user }}"
+      password: "{{ vcenter_pass }}"
+      validate_certs: no
+      esxi_hostname: "{{ esx_host }}"
+      datacenter: "{{ vc_datacenter }}"
+      name: "testcfvm"
+      state: poweredon
+      disk:
+      - size_gb: 40
+        type: thin
+        datastore: "{{ vc_datastore }}"
+      template: "{{ template_name }}"
+      networks: 
+      - name: VM Network
+        ip: 192.168.2.45
+        netmask: 255.255.255.0
+        gateway: 192.168.2.1
+        domain: home.lab
+        dns_servers:
+        - 8.8.8.8
+        - 8.8.4.4
+      customization:
+        dns_servers: 
+        - 8.8.8.8
+        - 8.8.4.4
+        runonce:
+          - 'echo "network: {config: disabled}" >> /etc/cloud/cloud.cfg.d/10_miq_cloud.cfg'
+      wait_for_ip_address: yes
+    delegate_to: localhost
+    register: deploy
+
+  - name: Debugging instance info
+    debug:
+      var: deploy.instance.hw_eth0.ipaddresses[0]
+
+  - name: add DB server to inventory
+    add_host:
+      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
+      ansible_ssh_user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+      groupname: cfdb
+    when: db
+
+  - name: add Worker to inventory
+    add_host:
+      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
+      ansible_ssh_user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+      groupname: cfwk
+    when: wk
+
+  - name: add UI server to inventory
+    add_host:
+      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
+      ansible_ssh__user: root
+      ansible_ssh_pass: "{{ cf_ssh_pass }}"
+      groupname: cfui
+    when: ui
