@@ -11,10 +11,6 @@
       timeout: "600"
       state: "started"
 
-  - name: Additional wait for API to become responive
-    pause:
-      minutes: 1
-
   - name: Create Zone
     shell: "/var/www/miq/vmdb/bin/rails runner 'Zone.create(:name => \"{{ zone_name }}\", :description => \"{{ zone_desc }}\")'"
 
