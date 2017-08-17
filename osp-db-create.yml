@@ -10,6 +10,9 @@
 
 - hosts: cfdb
   remote_user: root
+  vars:
+    zone_name: DB
+    zone_desc: Database zone
   vars_files:
     - 'roles/jritenour.cf-variables/vars/main.yml'
   roles: 
