@@ -4,28 +4,37 @@
   gather_facts: no
   remote_user: root
   vars_files:
-    - 'roles/jritenour.cf-variables/vars/main.yml'
+    - '../main.yml'
+  vars:
+    type: db
+    db: true
+    ui: false
+    wk: false
+    float_ip: "{{ db_server }}"
   roles:
     - {role: 'roles/jritenour.osp-cf-miq'}
 
 - hosts: cfdb
   remote_user: root
   vars_files:
-    - 'roles/jritenour.cf-variables/vars/main.yml'
+    - '../main.yml'
+  vars:
+    zone_name: DB
+    zone_desc: Database zone
   roles: 
     - {role: 'roles/jritenour.cf-miq-db'}
   tasks:
-  - name: Wait for CloudForms services to come up
-    wait_for:
-      host: "{{ float_ip }}"
-      port: "443"
-      delay: "120"
-      timeout: "600"
-      state: "started"
-
-  - name: Additional wait for API to become responive
-    pause:
-      minutes: 1
+#  - name: Wait for CloudForms services to come up
+#    wait_for:
+#      host: "{{ float_ip }}"
+#      port: "443"
+#      delay: "120"
+#      timeout: "600"
+#      state: "started"
+#
+#  - name: Additional wait for API to become responive
+#    pause:
+#      minutes: 1
 
   - name: Add host platform as provider
     uri:

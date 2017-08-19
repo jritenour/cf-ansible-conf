@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  remote_user: root
+  vars: 
+    type: wk
+    db: false
+    ui: false
+    wk: true
+    ip_addr: "{{ wk_server }}"
+  vars_files:
+    - '../main.yml'
+  roles:
+    - {role: 'roles/jritenour.vmware-cf-miq'}
+
+- hosts: cfwk
+  remote_user: root
+
+  vars:
+    zone_name: OpenStack
+    zone_desc: OpenStack Zone
+
+  vars_files:
+    - '../main.yml'
+
+  roles: 
+    - {role: 'roles/jritenour.cf-miq-wk'}

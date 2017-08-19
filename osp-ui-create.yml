@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  remote_user: root
+  vars: 
+    type: ui
+    db: false
+    ui: true
+    wk: false
+    float_ip: "{{ ui_server }}"
+  vars_files:
+    - '../main.yml'
+  roles:
+    - {role: 'roles/jritenour.osp-cf-miq'}
+
+- hosts: cfui
+  remote_user: root
+  vars:
+    zone_name: UI
+    zone_desc: UI Zone
+  vars_files:
+    - '../main.yml'
+  roles: 
+    - {role: 'roles/jritenour.cf-miq-ui'}
