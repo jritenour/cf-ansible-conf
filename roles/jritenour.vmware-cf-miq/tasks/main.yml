@@ -41,7 +41,7 @@
 
   - name: add DB server to inventory
     add_host:
-      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
+      hostname: "{{ db_server }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfdb
@@ -49,7 +49,7 @@
 
   - name: add Worker to inventory
     add_host:
-      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
+      hostname: "{{ wk_server }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfwk
@@ -57,7 +57,7 @@
 
   - name: add UI server to inventory
     add_host:
-      hostname: "{{ deploy.instance.hw_eth0.ipaddresses[0] }}"
+      hostname: "{{ ui_server }}"
       ansible_ssh__user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfui
