@@ -8,11 +8,11 @@
     db: false
     ui: false
     wk: true
-    ip_addr: "{{ wk_server }}"
+    float_ip: "{{ wk_server }}"
   vars_files:
     - '../main.yml'
   roles:
-    - {role: 'roles/jritenour.vmware-cf-miq'}
+    - {role: 'roles/jritenour.osp-cf-miq'}
 
 - hosts: cfwk
   remote_user: root
