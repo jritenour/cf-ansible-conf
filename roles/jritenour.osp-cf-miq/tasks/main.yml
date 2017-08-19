@@ -33,12 +33,6 @@
         - "{{ db_vol_name }}"
     register: osp_host
 
-  - name: add host to inventory
-    add_host:
-      name: "{{ float_ip }}"
-      ansible_user: root
-      ansible_ssh_pass: "{{ cf_ssh_pass }}"
-
   - name: wait for instance become ready to use
     wait_for:
      host: "{{ float_ip }}"

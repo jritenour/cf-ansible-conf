@@ -21,9 +21,6 @@
     zone_desc: Database zone
   vars_files:
     - '../main.yml'
-  vars:
-    zone_name: DB
-    zone_desc: Database zone
   roles: 
     - {role: 'roles/jritenour.cf-miq-db'}
   tasks:
