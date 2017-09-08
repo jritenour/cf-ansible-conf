@@ -27,6 +27,7 @@
         - net-name: "{{ network_name }}"
       image: "{{ image_uid }}"
       flavor: "{{ flavor_name }}"
+      security_groups: "{{ security_group }}"
       floating_ips:
         - "{{ float_ip }}"
       volumes:
