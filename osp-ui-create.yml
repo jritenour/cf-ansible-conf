@@ -16,10 +16,11 @@
 
 - hosts: cfui
   remote_user: root
+  vars_files:
+    - '../main.yml'
   vars:
     zone_name: UI
     zone_desc: UI Zone
-  vars_files:
-    - '../main.yml'
+    float_ip: "{{ ui_server }}"
   roles: 
     - {role: 'roles/jritenour.cf-miq-ui'}

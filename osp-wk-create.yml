@@ -16,13 +16,11 @@
 
 - hosts: cfwk
   remote_user: root
-
+  vars_files:
+    - '../main.yml'
   vars:
     zone_name: OpenStack
     zone_desc: OpenStack Zone
-
-  vars_files:
-    - '../main.yml'
-
+    float_ip: "{{ wk_server }}"
   roles: 
     - {role: 'roles/jritenour.cf-miq-wk'}
