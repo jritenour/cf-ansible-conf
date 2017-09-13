@@ -1,6 +1,6 @@
 ---
 # tasks file for jritenour.osp-cf-miq
-  - name: Create CFME DB volume
+  - name: Create CFME volume for instance
     os_volume:
       auth:
         auth_url: "{{ osp_url }}"
