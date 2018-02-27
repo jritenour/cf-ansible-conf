@@ -8,7 +8,9 @@
     db: false
     ui: false
     wk: true
-    num: 1
+    num: 
+     - 1
+     - 2
   vars_files:
     - '../main.yml'
   roles:

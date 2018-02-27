@@ -1,4 +1,4 @@
 ---
 - include: osp-db-create.yml
-- include: osp-ui-create.yml
+#- include: osp-ui-create.yml
 - include: osp-wk-create.yml

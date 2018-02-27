@@ -32,6 +32,42 @@
       volumes:
         - cf-{{ type }}-{{ num }}
     register: osp_host
+    when: db
+
+  - name: Add second interface to workers
+    os_server:
+      auth:
+        auth_url: "{{ osp_url }}"
+        username: "{{ osp_user }}"
+        password: "{{ osp_pass }}"
+        project_name: "{{ osp_project }}"
+      name: cf-{{ type }}-{{ num }}
+      state: present
+      key_name: "{{ key_name }}"
+      availability_zone: "{{ az }}"
+      nics:
+        - net-name: "{{ network_name }}"
+        - net-name: "{{ prov_net }}"
+      image: "{{ image_uid }}"
+      flavor: "{{ flavor_name }}"
+      security_groups: "{{ security_group }}"
+      volumes:
+        - cf-{{ type }}-{{ item }}
+    with_items: "{{ num }}"
+    when: wk
+ 
+  - name: assign floatingip to worker
+    os_floating_ip:
+      auth:
+        auth_url: "{{ osp_url }}"
+        username: "{{ osp_user }}"
+        password: "{{ osp_pass }}"
+        project_name: "{{ osp_project }}"
+      server: "{{ osp_host.openstack.name }}"
+      network: public
+      nat_destination: "{{ network_name }}" 
+    register: float
+    when: wk
 
   - name: Debug OSP host
     debug:
@@ -40,7 +76,6 @@
   - name: wait for instance become ready to use
     wait_for:
      host: "{{ osp_host.openstack.accessIPv4 }}"
-     port: "22"
      delay: "60"
      timeout: "320"
      state: "started"
@@ -55,7 +90,7 @@
 
   - name: add Worker to inventory
     add_host:
-      hostname: "{{ osp_host.openstack.accessIPv4 }}"
+      hostname: "{{ osp_host.openstack.private_v4 }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfwk
