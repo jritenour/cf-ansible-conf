@@ -8,7 +8,7 @@
     db: false
     ui: true
     wk: false
-    float_ip: "{{ ui_server }}"
+    num: 1
   vars_files:
     - '../main.yml'
   roles:
@@ -21,6 +21,6 @@
   vars:
     zone_name: UI
     zone_desc: UI Zone
-    float_ip: "{{ ui_server }}"
+    db_server: "{{ hostvars[groups['cfdb'][0]]['ansible_default_ipv4']['address'] }}"
   roles: 
     - {role: 'roles/jritenour.cf-miq-ui'}

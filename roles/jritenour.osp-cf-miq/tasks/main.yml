@@ -10,7 +10,7 @@
       state: present
       availability_zone: "{{ az }}"
       size: "{{ db_size }}"
-      display_name: "{{ db_vol_name }}"
+      display_name: cf-{{ type }}-{{ num }}
 
   - name: launch instances
     os_server:
@@ -19,7 +19,7 @@
         username: "{{ osp_user }}"
         password: "{{ osp_pass }}"
         project_name: "{{ osp_project }}"
-      name: "{{ vm_name }}"
+      name: cf-{{ type }}-{{ num }}
       state: present
       key_name: "{{ key_name }}"
       availability_zone: "{{ az }}"
@@ -28,15 +28,18 @@
       image: "{{ image_uid }}"
       flavor: "{{ flavor_name }}"
       security_groups: "{{ security_group }}"
-      floating_ips:
-        - "{{ float_ip }}"
+      auto_ip: yes
       volumes:
-        - "{{ db_vol_name }}"
+        - cf-{{ type }}-{{ num }}
     register: osp_host
+
+  - name: Debug OSP host
+    debug:
+      var: osp_host
 
   - name: wait for instance become ready to use
     wait_for:
-     host: "{{ float_ip }}"
+     host: "{{ osp_host.openstack.accessIPv4 }}"
      port: "22"
      delay: "60"
      timeout: "320"
@@ -44,7 +47,7 @@
 
   - name: add DB server to inventory
     add_host:
-      hostname: "{{ db_server }}"
+      hostname: "{{ osp_host.openstack.accessIPv4 }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfdb
@@ -52,7 +55,7 @@
 
   - name: add Worker to inventory
     add_host:
-      hostname: "{{ wk_server }}"
+      hostname: "{{ osp_host.openstack.accessIPv4 }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfwk
@@ -60,7 +63,7 @@
 
   - name: add UI server to inventory
     add_host:
-      hostname: "{{ ui_server }}"
+      hostname: "{{ osp_host.openstack.accessIPv4 }}"
       ansible_ssh__user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfui
