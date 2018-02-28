@@ -32,7 +32,7 @@
       volumes:
         - cf-{{ type }}-{{ num }}
     register: osp_host
-    when: db
+    when: db or ui
 
   - name: Add second interface to workers
     os_server:
@@ -54,6 +54,7 @@
       volumes:
         - cf-{{ type }}-{{ item }}
     with_items: "{{ num }}"
+    register: osp_wk
     when: wk
  
   - name: assign floatingip to worker
@@ -90,7 +91,7 @@
 
   - name: add Worker to inventory
     add_host:
-      hostname: "{{ osp_host.openstack.private_v4 }}"
+      hostname: "{{ osp_wk.openstack.private_v4 }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfwk
