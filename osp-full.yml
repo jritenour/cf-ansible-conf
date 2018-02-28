@@ -1,4 +1,4 @@
 ---
-- include: osp-db-create.yml
-#- include: osp-ui-create.yml
-- include: osp-wk-create.yml
+- import_playbook: osp-db-create.yml
+- import_playbook: osp-ui-create.yml
+- import_playbook: osp-wk-create.yml

@@ -8,9 +8,7 @@
     db: false
     ui: false
     wk: true
-    num: 
-     - 1
-     - 2
+    num: 1
   vars_files:
     - '../main.yml'
   roles:
@@ -23,12 +21,24 @@
   vars:
     zone_name: OpenStack
     zone_desc: OpenStack Zone
-    db_server: "{{ hostvars[groups['cfdb'][0]]['ansible_default_ipv4']['address'] }}"
+#    db_server: "{{ hostvars[groups['cfdb'][0]]['ansible_default_ipv4']['address'] }}"
   roles: 
     - {role: 'roles/jritenour.cf-miq-wk'}
 
   tasks:
-  - name: Add host platform as provider
+  - name: copy ifcfg-eth1
+    template:
+      src: ifcg
+      dest: '/etc/sysconfig/network-scripts/ifcfg-eth1'
+  - name: enable eth1
+    command: ifup eth1
+
+- hosts: cfdb
+  remote_user: root
+  vars_files:
+    - '../main.yml'
+  tasks:
+  - name: Add Overcloud as provider
     uri:
       url: "https://{{ db_server }}/api/providers"
       method: POST
@@ -48,3 +58,24 @@
         credentials:
           userid: "{{ osp_user }}"
           password: "{{ osp_pass }}"
+
+  - name: Add undercloud as provider
+    uri:
+      url: "https://{{ db_server }}/api/providers"
+      method: POST
+      user: admin
+      password: "{{ cf_ssh_pass }}"
+      validate_certs: no
+      headers:
+        Content-Type:  application/json
+      body_format: json
+      body:
+        type: "ManageIQ::Providers::Openstack::InfraManager"
+        name:  OSP Undercloud 
+        hostname: "{{ undercloud_ip }}"
+        ipaddress: "{{ undercloud_ip }}"
+        port: "13000"
+        security_protocol: "non_ssl"
+        credentials:
+          userid: "{{ undercloud_user }}"
+          password: "{{ undercloud_pw }}"

@@ -10,7 +10,9 @@
       state: present
       availability_zone: "{{ az }}"
       size: "{{ db_size }}"
-      display_name: cf-{{ type }}-{{ num }}
+      display_name: cf-{{ type }}-{{ item }}
+    with_sequence:
+      count={{ num }}
 
   - name: launch instances
     os_server:
@@ -41,7 +43,7 @@
         username: "{{ osp_user }}"
         password: "{{ osp_pass }}"
         project_name: "{{ osp_project }}"
-      name: cf-{{ type }}-{{ num }}
+      name: cf-{{ type }}-{{ item }}
       state: present
       key_name: "{{ key_name }}"
       availability_zone: "{{ az }}"
@@ -53,10 +55,11 @@
       security_groups: "{{ security_group }}"
       volumes:
         - cf-{{ type }}-{{ item }}
-    with_items: "{{ num }}"
+    with_sequence:
+      count={{ num }}
     register: osp_wk
     when: wk
- 
+
   - name: assign floatingip to worker
     os_floating_ip:
       auth:
@@ -64,22 +67,34 @@
         username: "{{ osp_user }}"
         password: "{{ osp_pass }}"
         project_name: "{{ osp_project }}"
-      server: "{{ osp_host.openstack.name }}"
+      server: cf-wk-{{ item }}
       network: public
       nat_destination: "{{ network_name }}" 
+      wait: True
     register: float
+    with_sequence:
+      count={{ num }}
     when: wk
 
-  - name: Debug OSP host
-    debug:
-      var: osp_host
+  - name: Get worker info (os_floating_ip null value workaround)
+    os_server_facts:
+      auth:
+        auth_url: "{{ osp_url }}"
+        username: "{{ osp_user }}"
+        password: "{{ osp_pass }}"
+        project_name: "{{ osp_project }}"
+      server: cf-wk*
+  
+  - debug: 
+      var: openstack_servers
 
   - name: wait for instance become ready to use
     wait_for:
-     host: "{{ osp_host.openstack.accessIPv4 }}"
-     delay: "60"
-     timeout: "320"
-     state: "started"
+      host: "{{ osp_host.openstack.accessIPv4 }}"
+      delay: "60"
+      timeout: "320"
+      state: "started"
+    when: db or ui
 
   - name: add DB server to inventory
     add_host:
@@ -91,10 +106,11 @@
 
   - name: add Worker to inventory
     add_host:
-      hostname: "{{ osp_wk.openstack.private_v4 }}"
+      hostname: "{{ item.private_v4 }}"
       ansible_ssh_user: root
       ansible_ssh_pass: "{{ cf_ssh_pass }}"
       groupname: cfwk
+    with_items: "{{ openstack_servers }}"
     when: wk
 
   - name: add UI server to inventory
