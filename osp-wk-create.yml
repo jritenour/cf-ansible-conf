@@ -8,7 +8,7 @@
     db: false
     ui: false
     wk: true
-    num: 1
+    num: 2
   vars_files:
     - '../main.yml'
   roles:
@@ -21,7 +21,7 @@
   vars:
     zone_name: OpenStack
     zone_desc: OpenStack Zone
-#    db_server: "{{ hostvars[groups['cfdb'][0]]['ansible_default_ipv4']['address'] }}"
+    db_server: "{{ hostvars[groups['cfdb'][0]]['ansible_default_ipv4']['address'] }}"
   roles: 
     - {role: 'roles/jritenour.cf-miq-wk'}
 

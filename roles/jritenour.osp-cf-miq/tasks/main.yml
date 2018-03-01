@@ -84,14 +84,20 @@
         password: "{{ osp_pass }}"
         project_name: "{{ osp_project }}"
       server: cf-wk*
+    when: wk
   
   - debug: 
       var: openstack_servers
+    when: wk
+   
+  - name: debug
+    debug:
+      var: osp_host
 
   - name: wait for instance become ready to use
     wait_for:
       host: "{{ osp_host.openstack.accessIPv4 }}"
-      delay: "60"
+      port: 22 
       timeout: "320"
       state: "started"
     when: db or ui
